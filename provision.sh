@@ -29,6 +29,7 @@ EOD
 	apache_go
 	php_go
 	mysql_go
+	phpmyadmin_go
 
 	touch /var/lock/vagrant-provision
 }
@@ -112,6 +113,20 @@ mysql_go() {
 
 	service mysql restart
 	update-rc.d apache2 enable
+}
+
+phpmyadmin_go() {
+	php5enmod mcrypt
+
+	echo "phpmyadmin phpmyadmin/dbconfig-install boolean true" | debconf-set-selections
+	echo "phpmyadmin phpmyadmin/app-password-confirm password root" | debconf-set-selections
+	echo "phpmyadmin phpmyadmin/mysql/admin-pass password root" | debconf-set-selections
+	echo "phpmyadmin phpmyadmin/mysql/app-pass password root" | debconf-set-selections
+	echo "phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2" | debconf-set-selections
+	
+	apt-get -y install phpmyadmin
+	
+	service apache2 reload
 }
 
 main
